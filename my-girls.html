@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b10">
+<title>My Girls</title>
+<style>
+:root{--bg:#0b0b10;--card:#15151d;--card2:#1d1d28;--text:#f7f7fb;--muted:#9a9aa8;--accent:#ff4f87;--accent2:#9d6cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#211322,#0b0b10 48%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,Arial,sans-serif;min-height:100vh}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:30px}
+header{padding:22px 18px 10px;display:flex;align-items:center;justify-content:space-between}
+h1{font-size:28px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:3px}
+.icon{border:0;background:var(--card2);color:white;width:42px;height:42px;border-radius:14px;font-size:19px}
+.grid{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.person{background:linear-gradient(160deg,#1b1b25,#111119);border:1px solid #292936;border-radius:22px;overflow:hidden;box-shadow:0 12px 35px #0005;cursor:pointer}
+.avatar{height:190px;display:flex;align-items:flex-end;padding:12px;font-size:60px;background:linear-gradient(145deg,#40203c,#191927)}
+.info{padding:12px}.name{font-weight:700;font-size:17px}.age{font-weight:400;color:#aaa}.tag{font-size:12px;color:#d0a8ff;margin-top:4px}.desc{font-size:12px;color:#aaa;margin-top:7px;line-height:1.35}
+.chat{display:none;min-height:100vh;flex-direction:column}.chathead{padding:16px;display:flex;gap:12px;align-items:center;border-bottom:1px solid #24242e;background:#0d0d13cc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:2}.back{border:0;background:none;color:white;font-size:25px}.mini{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#40203c,#191927);display:grid;place-items:center;font-size:28px}.messages{padding:18px 14px 100px;display:flex;flex-direction:column;gap:10px}.bubble{max-width:82%;padding:11px 14px;border-radius:18px;line-height:1.4;font-size:15px}.girl{align-self:flex-start;background:var(--card2);border-bottom-left-radius:5px}.me{align-self:flex-end;background:linear-gradient(135deg,#ff4f87,#9d6cff);border-bottom-right-radius:5px}.composer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:520px;width:100%;padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;background:#0b0b10eF;backdrop-filter:blur(16px)}input{flex:1;border:1px solid #30303b;background:#191922;color:white;border-radius:18px;padding:13px 14px;outline:none}button.send{border:0;border-radius:17px;background:var(--accent);color:white;width:50px;font-size:18px}
+#age{position:fixed;inset:0;background:#08080c;display:flex;align-items:center;justify-content:center;padding:25px;z-index:10}.agebox{max-width:380px;text-align:center;background:#15151d;border:1px solid #2b2b38;border-radius:26px;padding:28px}.agebox h2{margin-top:0}.agebox p{color:#aaa;line-height:1.5}.enter{border:0;background:linear-gradient(135deg,#ff4f87,#9d6cff);color:white;padding:14px 22px;border-radius:15px;font-weight:700;width:100%;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="age"><div class="agebox"><h2>🔞 My Girls</h2><p>Bu uygulamadaki karakterler tamamen kurgusaldır ve yetişkin kullanıcılar içindir. Devam ederek 18 yaşından büyük olduğunu onaylarsın.</p><button class="enter" onclick="enter()">18+ Devam Et</button></div></div>
+
+<div class="app">
+<section id="home">
+<header><div><h1>My Girls ❤️</h1><div class="sub">Sana özel sanal karakterler</div></div><button class="icon" onclick="resetChats()">↻</button></header>
+<div class="grid" id="grid"></div>
+</section>
+
+<section id="chat" class="chat">
+<div class="chathead"><button class="back" onclick="closeChat()">‹</button><div class="mini" id="chatAvatar"></div><div><b id="chatName"></b><div class="sub" id="chatDesc"></div></div></div>
+<div class="messages" id="messages"></div>
+<div class="composer"><input id="input" placeholder="Mesajını yaz..." autocomplete="off"><button class="send" onclick="send()">➤</button></div>
+</section>
+</div>
+
+<script>
+const girls=[
+{id:"elif",name:"Elif",age:24,avatar:"👩🏻‍🦰",tag:"Neşeli • Flörtöz",desc:"Samimi, esprili ve biraz kıskanç.",greet:"Selam 😊 Sonunda geldin. Bugün nasıl geçti?"},
+{id:"derya",name:"Derya",age:27,avatar:"👩🏻",tag:"Romantik • Sakin",desc:"İlgili, romantik ve derin sohbetleri seviyor.",greet:"Merhaba ❤️ Seni görmek güzel. Biraz sohbet edelim mi?"},
+{id:"zeynep",name:"Zeynep",age:25,avatar:"👩🏽‍🦱",tag:"Enerjik • Eğlenceli",desc:"Hareketli, şakacı ve spontan.",greet:"Hey 😄 Bugün enerjin nasıl? Benimki yerinde!"},
+{id:"selin",name:"Selin",age:29,avatar:"👩🏼",tag:"Olgun • Nazik",desc:"Sakin, özgüvenli ve sıcak konuşuyor.",greet:"Hoş geldin. Seni dinliyorum, anlat bakalım ❤️"}
+];
+
+let current=null, chats=JSON.parse(localStorage.getItem("mygirls_chats")||"{}");
+
+function enter(){localStorage.setItem("mygirls_age","1");document.getElementById("age").style.display="none"}
+if(localStorage.getItem("mygirls_age")) document.getElementById("age").style.display="none";
+
+function render(){
+ document.getElementById("grid").innerHTML=girls.map(g=>`<div class="person" onclick="openChat('${g.id}')"><div class="avatar">${g.avatar}</div><div class="info"><div class="name">${g.name} <span class="age">${g.age}</span></div><div class="tag">${g.tag}</div><div class="desc">${g.desc}</div></div></div>`).join("");
+}
+function openChat(id){
+ current=girls.find(x=>x.id===id);document.getElementById("home").style.display="none";document.getElementById("chat").style.display="flex";
+ chatAvatar.textContent=current.avatar;chatName.textContent=current.name+" "+current.age;chatDesc.textContent=current.tag;
+ if(!chats[id]) chats[id]=[{from:"girl",text:current.greet}];
+ renderMessages();input.focus();
+}
+function closeChat(){document.getElementById("chat").style.display="none";document.getElementById("home").style.display="block";current=null}
+function renderMessages(){messages.innerHTML=chats[current.id].map(m=>`<div class="bubble ${m.from==="me"?"me":"girl"}">${escapeHTML(m.text)}</div>`).join("");window.scrollTo(0,document.body.scrollHeight)}
+function send(){
+ let t=input.value.trim();if(!t||!current)return;
+ chats[current.id].push({from:"me",text:t});input.value="";save();renderMessages();
+ setTimeout(()=>reply(t),650+Math.random()*900);
+}
+function reply(t){
+ const replies=[
+ "Bunu anlatmana sevindim 😊 Biraz daha anlatır mısın?",
+ "Hmm, ilgimi çektin ❤️ Sen bu konuda ne hissediyorsun?",
+ "Seninle böyle sohbet etmek hoşuma gidiyor.",
+ "Gülümsetiyorsun beni 😄",
+ "Bugün senden güzel bir enerji alıyorum.",
+ "Peki, şimdi sana bir soru sorayım: şu an en çok ne yapmak isterdin?"
+ ];
+ chats[current.id].push({from:"girl",text:replies[Math.floor(Math.random()*replies.length)]});save();renderMessages();
+}
+function save(){localStorage.setItem("mygirls_chats",JSON.stringify(chats))}
+function resetChats(){if(confirm("Tüm sohbet geçmişi silinsin mi?")){chats={};save();}}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+input.addEventListener("keydown",e=>{if(e.key==="Enter")send()});
+render();
+</script>
+</body>
+</html>
